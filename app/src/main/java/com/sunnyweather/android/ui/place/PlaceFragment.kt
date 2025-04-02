@@ -1,5 +1,6 @@
 package com.sunnyweather.android.ui.place
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -15,10 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sunnyweather.android.R
 import androidx.core.widget.addTextChangedListener
+import com.sunnyweather.android.MainActivity
+import com.sunnyweather.android.ui.weather.WeatherActivity
 
 class PlaceFragment: Fragment() {
     //用lazy懒加载技术获取PlaceViewModel实例
-    private val viewModel by lazy { ViewModelProvider(this)?.get(PlaceViewModel::class.java) }
+    val viewModel by lazy { ViewModelProvider(this)?.get(PlaceViewModel::class.java) }
     private lateinit var adapter: PlaceAdapter
 
     //加载前面编写的fragment_place布局
@@ -33,6 +36,19 @@ class PlaceFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel?.takeIf { activity is MainActivity&& it.isPlaceSaved() }?.let { vm ->
+            vm.getSavedPlace()?.let { place ->
+                Intent(context, WeatherActivity::class.java).apply {
+                    putExtra("location_lng", place.location.lng)
+                    putExtra("location_lat", place.location.lat)
+                    putExtra("place_name", place.name)
+                }.run {
+                    startActivity(this)
+                    activity?.finish()
+                    return
+                }
+            }
+        }
         val layoutManager=LinearLayoutManager(activity)
         val recyclerView=view.findViewById<RecyclerView>(R.id.recyclerView)
         val bgImageView=view.findViewById<ImageView>(R.id.bgImageView)
@@ -63,7 +79,7 @@ class PlaceFragment: Fragment() {
                 viewModel!!.placeList.addAll(places)
                 adapter.notifyDataSetChanged()
             }else{
-                Toast.makeText(activity,"nonononononoon",Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity,"未能查询到任何地点",Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
         })

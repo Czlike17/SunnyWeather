@@ -1,6 +1,6 @@
 package com.sunnyweather.android.logic.model
 
-import android.location.Location
+
 import com.google.gson.annotations.SerializedName
 
 //定义数据模型的类与属性
