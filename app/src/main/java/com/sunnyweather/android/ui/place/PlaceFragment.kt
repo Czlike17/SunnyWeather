@@ -6,6 +6,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
@@ -30,7 +31,12 @@ class PlaceFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_place,container,false)
+        val view = inflater.inflate(R.layout.fragment_place, container, false)
+
+        view.findViewById<Button>(R.id.btn_back_to_device).setOnClickListener {
+            activity?.finish()
+        }
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

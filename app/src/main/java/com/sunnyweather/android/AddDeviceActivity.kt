@@ -17,24 +17,19 @@ class AddDeviceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_device)
 
-        // 初始化控件
         etDeviceName = findViewById(R.id.et_device_name)
         etIpAddress = findViewById(R.id.et_ip_address)
         etPort = findViewById(R.id.et_port)
 
-        // 返回按钮点击事件
         findViewById<Button>(R.id.btn_back).setOnClickListener {
-            finish()  // 返回主界面
+            finish()
         }
 
-        // 取消按钮点击事件
         findViewById<Button>(R.id.btn_cancel).setOnClickListener {
-            finish()  // 返回主界面
+            finish()
         }
 
-        // 添加按钮点击事件
         findViewById<Button>(R.id.btn_add).setOnClickListener {
-            // 获取输入内容
             val deviceName = etDeviceName.text.toString().trim()
             val ipAddress = etIpAddress.text.toString().trim()
             val port = etPort.text.toString().trim()
@@ -50,25 +45,21 @@ class AddDeviceActivity : AppCompatActivity() {
             intent.putExtra("ipAddress", ipAddress)
             intent.putExtra("port", port)
             setResult(RESULT_OK, intent)
-            finish()  // 关闭当前页面
+            finish()
         }
     }
 
-    // 验证输入合法性
     private fun validateInput(deviceName: String, ipAddress: String, port: String): Boolean {
-        // 验证设备名称
         if (deviceName.isEmpty()) {
             showToast("请输入设备名称")
             return false
         }
 
-        // 验证IP地址
         if (ipAddress.isEmpty() || !isValidIpAddress(ipAddress)) {
             showToast("请输入有效的IP地址")
             return false
         }
 
-        // 验证端口号
         if (port.isEmpty()) {
             showToast("请输入端口号")
             return false
@@ -92,7 +83,6 @@ class AddDeviceActivity : AppCompatActivity() {
         return ipPattern.matcher(ip).matches()
     }
 
-    // 显示提示信息
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
