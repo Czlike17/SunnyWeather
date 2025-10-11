@@ -26,32 +26,25 @@ class DeviceControlActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_control)
 
-        // 初始化视图
         initViews()
-        // 加载示例设备
         initSampleDevices()
-        // 初始化适配器
         initAdapter()
     }
 
-    // 初始化视图组件
     private fun initViews() {
         recyclerView = findViewById(R.id.device_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // 跳转添加设备页面
         findViewById<FloatingActionButton>(R.id.next_button).setOnClickListener {
             val intent = Intent(this, AddDeviceActivity::class.java)
             startActivityForResult(intent, ADD_DEVICE_REQUEST)
         }
 
-        // 跳转天气预报页面
         findViewById<Button>(R.id.btn_weather)?.setOnClickListener {
             startActivity(Intent(this, WeatherActivity::class.java))
         }
     }
 
-    // 初始化适配器
     private fun initAdapter() {
         deviceAdapter = DeviceAdapter(
             this,
@@ -95,7 +88,6 @@ class DeviceControlActivity : AppCompatActivity() {
                     outputStream.write(command.toByteArray(Charsets.UTF_8))
                     outputStream.flush()
 
-                    // 主线程显示成功提示
                     Handler(Looper.getMainLooper()).post {
                         Toast.makeText(
                             this,
@@ -138,9 +130,7 @@ class DeviceControlActivity : AppCompatActivity() {
         }
     }
 
-    // 避免内存泄漏，清除Handler引用
     override fun onDestroy() {
         super.onDestroy()
-        // 若使用Handler子类，需在此处移除所有回调和消息
     }
 }

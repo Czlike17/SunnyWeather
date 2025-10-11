@@ -16,7 +16,7 @@ class DeviceAdapter(
     private val context: Context,
     private var deviceList: MutableList<Device>,
     private val onConfirmClickListener: (Device) -> Unit,
-    private val onDeviceDeleted: (Int) -> Unit  // 新增删除回调
+    private val onDeviceDeleted: (Int) -> Unit
 ) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
 
     inner class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -25,7 +25,7 @@ class DeviceAdapter(
         val brightnessSeekbar: SeekBar = itemView.findViewById(R.id.brightness_seekbar)
         val brightnessValue: TextView = itemView.findViewById(R.id.brightness_value)
         val confirmButton: Button = itemView.findViewById(R.id.confirm_button)
-        val deleteButton: ImageButton = itemView.findViewById(R.id.btn_delete)  // 绑定删除按钮
+        val deleteButton: ImageButton = itemView.findViewById(R.id.btn_delete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -64,9 +64,8 @@ class DeviceAdapter(
             onConfirmClickListener(device)
         }
 
-        // 新增：删除按钮点击事件
         holder.deleteButton.setOnClickListener {
-            showDeleteConfirmDialog(holder.adapterPosition)  // 使用adapterPosition确保位置正确
+            showDeleteConfirmDialog(holder.adapterPosition)
         }
     }
 
@@ -87,13 +86,11 @@ class DeviceAdapter(
 
     override fun getItemCount() = deviceList.size
 
-    // 添加新设备
     fun addDevice(device: Device) {
         deviceList.add(device)
         notifyItemInserted(deviceList.size - 1)
     }
 
-    // 新增：删除设备
     fun removeDevice(position: Int) {
         deviceList.removeAt(position)
         notifyItemRemoved(position)
