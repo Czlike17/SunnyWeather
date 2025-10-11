@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="175dp"
                 android:backgroundTint="@android:color/holo_blue_light"
-                android:text="确认亮度"
+                android:text="确认"
                 android:textColor="@android:color/white" />
         </LinearLayout>
 

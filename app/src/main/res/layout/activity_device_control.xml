@@ -41,6 +41,17 @@
         android:padding="5dp"
         tools:listitem="@layout/item_device" />
 
+    <TextView
+        android:id="@+id/empty_hint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:gravity="center"
+        android:text="暂无设备，请点击右下角按钮添加"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/next_button"
         android:layout_width="wrap_content"
