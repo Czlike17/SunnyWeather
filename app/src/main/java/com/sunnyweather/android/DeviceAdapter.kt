@@ -1,6 +1,8 @@
 package com.sunnyweather.android
 
 import android.app.AlertDialog
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +11,17 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import android.content.Context
+import java.io.OutputStream
+import java.net.Socket
+import java.net.InetSocketAddress
+
 
 class DeviceAdapter(
     private val context: Context,
     private var deviceList: MutableList<Device>,
-    private val onConfirmClickListener: (Device) -> Unit,
     private val onDeviceDeleted: (Int) -> Unit
 ) : RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder>() {
 
@@ -24,7 +30,8 @@ class DeviceAdapter(
         val powerSwitch: Switch = itemView.findViewById(R.id.power_switch)
         val brightnessSeekbar: SeekBar = itemView.findViewById(R.id.brightness_seekbar)
         val brightnessValue: TextView = itemView.findViewById(R.id.brightness_value)
-        val confirmButton: Button = itemView.findViewById(R.id.confirm_button)
+        val connectButton: Button = itemView.findViewById(R.id.connect_button)
+        val disconnectButton: Button = itemView.findViewById(R.id.disconnect_button)
         val deleteButton: ImageButton = itemView.findViewById(R.id.btn_delete)
     }
 
@@ -43,30 +50,154 @@ class DeviceAdapter(
         holder.brightnessSeekbar.progress = device.brightness
         holder.brightnessValue.text = "${device.brightness}%"
 
+        // 根据连接状态更新UI
+        updateConnectionUI(holder, device.isConnected)
+
         // 电源开关状态监听
         holder.powerSwitch.setOnCheckedChangeListener { _, isChecked ->
             device.isPowerOn = isChecked
+            if (device.isConnected) {
+                sendCommandToDevice(device)
+            }
         }
 
         // 亮度调节监听
         holder.brightnessSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                device.brightness = progress
-                holder.brightnessValue.text = "$progress%"
+                if (fromUser) {
+                    device.brightness = progress
+                    holder.brightnessValue.text = "$progress%"
+                    if (device.isConnected) {
+                        sendCommandToDevice(device)
+                    }
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // 确认按钮点击事件
-        holder.confirmButton.setOnClickListener {
-            onConfirmClickListener(device)
+        holder.connectButton.setOnClickListener {
+            connectToDevice(device, holder)
+        }
+
+        holder.disconnectButton.setOnClickListener {
+            disconnectFromDevice(device, holder)
         }
 
         holder.deleteButton.setOnClickListener {
             showDeleteConfirmDialog(holder.adapterPosition)
         }
+    }
+
+    private fun updateConnectionUI(holder: DeviceViewHolder, isConnected: Boolean) {
+        holder.connectButton.isEnabled = !isConnected
+        holder.disconnectButton.isEnabled = isConnected
+        holder.powerSwitch.isEnabled = isConnected
+        holder.brightnessSeekbar.isEnabled = isConnected
+    }
+
+    private fun connectToDevice(device: Device, holder: DeviceViewHolder) {
+        Toast.makeText(context, "正在连接设备...", Toast.LENGTH_SHORT).show()
+
+        val handler = Handler(Looper.getMainLooper())
+        val timeoutRunnable = Runnable {
+            // 超时未连接成功，执行失败处理
+            if (!device.isConnected) {
+                device.socket?.close()
+                device.socket = null
+                device.isConnected = false
+
+                handler.post {
+                    updateConnectionUI(holder, false)
+                }
+            }
+        }
+
+        handler.postDelayed(timeoutRunnable, 8000)
+
+        Thread {
+            try {
+                val socket = Socket()
+                socket.connect(InetSocketAddress(device.ipAddress, device.port.toInt()), 8000)
+
+                device.socket = socket
+                device.isConnected = true
+
+                handler.removeCallbacks(timeoutRunnable)
+
+                // 在UI线程更新状态
+                handler.post {
+                    updateConnectionUI(holder, true)
+                    Toast.makeText(context, "您已连接上设备", Toast.LENGTH_SHORT).show()
+                    // 发送当前状态
+                    sendCommandToDevice(device)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // 异常情况，确保超时任务执行
+                handler.post {
+                    if (!device.isConnected) {
+                        Toast.makeText(
+                            context,
+                            "连接失败: 无法连接到 ${device.ipAddress}:${device.port}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    // 断开设备连接
+    private fun disconnectFromDevice(device: Device, holder: DeviceViewHolder) {
+        try {
+            device.socket?.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            device.socket = null
+            device.isConnected = false
+
+            // 在UI线程更新状态
+            Handler(Looper.getMainLooper()).post {
+                updateConnectionUI(holder, false)
+                Toast.makeText(context, "您已断开连接", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // 发送命令到设备
+    private fun sendCommandToDevice(device: Device) {
+        Thread {
+            try {
+                val command = """
+                    {
+                        "deviceName": "${device.name}",
+                        "power": ${device.isPowerOn},
+                        "brightness": ${device.brightness}
+                    }
+                """.trimIndent()
+
+                // 通过已建立的Socket发送数据
+                device.socket?.let { socket ->
+                    if (socket.isConnected && !socket.isClosed) {
+                        val outputStream: OutputStream = socket.getOutputStream()
+                        outputStream.write(command.toByteArray(Charsets.UTF_8))
+                        outputStream.flush()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        context,
+                        "发送命令失败，请检查连接",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }.start()
     }
 
     // 显示删除确认弹窗
@@ -75,6 +206,7 @@ class DeviceAdapter(
             .setTitle("删除设备")
             .setMessage("确定要删除 ${deviceList[position].name} 吗？")
             .setPositiveButton("确定") { _, _ ->
+                deviceList[position].socket?.close()
                 onDeviceDeleted(position)  // 触发删除回调
             }
             .setNegativeButton("取消") { dialog, _ ->
