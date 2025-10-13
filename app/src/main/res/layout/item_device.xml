@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
     android:background="@drawable/background_frame"
-    android:padding="5dp">
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="80dp"
-                android:backgroundTint="@android:color/holo_green_light"
+                android:background="@drawable/btn_connect_bg"
                 android:text="连接"
                 android:textColor="@android:color/white" />
 
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:backgroundTint="@android:color/holo_red_light"
+                android:background="@drawable/btn_disconnect_bg"
                 android:text="断开"
                 android:textColor="@android:color/white"
                 android:enabled="false"/>

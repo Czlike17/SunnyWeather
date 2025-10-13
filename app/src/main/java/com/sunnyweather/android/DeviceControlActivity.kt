@@ -27,6 +27,12 @@ class DeviceControlActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.device_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        val decorView = window.decorView
+        decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                )
         deviceAdapter = DeviceAdapter(
             this,
             deviceList,
