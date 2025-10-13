@@ -15,7 +15,7 @@ import com.sunnyweather.android.ui.weather.WeatherActivity
 class DeviceControlActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var deviceAdapter: DeviceAdapter
-    private val deviceList = mutableListOf<Device>()
+    private val deviceList by lazy { DeviceStorage.loadDevices(this) }
     private val ADD_DEVICE_REQUEST = 1001  // 请求码
     private lateinit var emptyHint: TextView
 
@@ -33,6 +33,8 @@ class DeviceControlActivity : AppCompatActivity() {
             onDeviceDeleted = { position ->
                 deviceAdapter.removeDevice(position)
                 updateEmptyState()
+                // 删除后保存
+                DeviceStorage.saveDevices(this, deviceList)
                 Toast.makeText(this, "设备已删除", Toast.LENGTH_SHORT).show()
             }
         )
@@ -50,20 +52,19 @@ class DeviceControlActivity : AppCompatActivity() {
         }
     }
 
-    // 接收从AddDeviceActivity返回的结果
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ADD_DEVICE_REQUEST && resultCode == RESULT_OK) {
             data?.let { intent ->
-                // 获取新设备信息
                 val deviceName = intent.getStringExtra("deviceName") ?: ""
                 val ipAddress = intent.getStringExtra("ipAddress") ?: ""
                 val port = intent.getStringExtra("port") ?: ""
 
-                // 添加新设备到列表
                 val newDevice = Device(deviceName, ipAddress, port)
                 deviceAdapter.addDevice(newDevice)
                 updateEmptyState()
+                // 添加后保存
+                DeviceStorage.saveDevices(this, deviceList)
                 Toast.makeText(this, "已添加新设备: $deviceName", Toast.LENGTH_SHORT).show()
             }
         }
