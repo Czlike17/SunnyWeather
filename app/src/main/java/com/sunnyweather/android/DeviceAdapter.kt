@@ -14,6 +14,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import android.content.Context
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.Socket
 import java.net.InetSocketAddress
@@ -102,15 +105,11 @@ class DeviceAdapter(
 
         val handler = Handler(Looper.getMainLooper())
         val timeoutRunnable = Runnable {
-            // 超时未连接成功，执行失败处理
             if (!device.isConnected) {
                 device.socket?.close()
                 device.socket = null
                 device.isConnected = false
-
-                handler.post {
-                    updateConnectionUI(holder, false)
-                }
+                handler.post { updateConnectionUI(holder, false) }
             }
         }
 
@@ -125,24 +124,61 @@ class DeviceAdapter(
                 device.isConnected = true
 
                 handler.removeCallbacks(timeoutRunnable)
-
-                // 在UI线程更新状态
                 handler.post {
                     updateConnectionUI(holder, true)
-                    Toast.makeText(context, "您已连接上设备", Toast.LENGTH_SHORT).show()
-                    // 发送当前状态
+                    Toast.makeText(context, "已连接设备", Toast.LENGTH_SHORT).show()
                     sendCommandToDevice(device)
                 }
+
+                // 启动数据接收线程
+                startDataReceiver(device, holder, handler)
+
             } catch (e: Exception) {
                 e.printStackTrace()
-                // 异常情况，确保超时任务执行
                 handler.post {
                     if (!device.isConnected) {
                         Toast.makeText(
                             context,
-                            "连接失败: 无法连接到 ${device.ipAddress}:${device.port}",
+                            "连接失败: ${device.ipAddress}:${device.port}",
                             Toast.LENGTH_SHORT
                         ).show()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    // 数据接收方法
+    private fun startDataReceiver(device: Device, holder: DeviceViewHolder, handler: Handler) {
+        Thread {
+            try {
+                val inputStream = device.socket?.getInputStream()
+                val reader = BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8))
+
+                var line: String? = null
+                while (device.isConnected && reader.readLine().also { line = it } != null) {
+                    line?.let { json ->
+                        // 解析ESP32发送的JSON数据
+                        val jsonObject = JSONObject(json)
+                        val brightness = jsonObject.getInt("brightness")
+                        val power = jsonObject.getBoolean("power")
+
+                        // 回调主线程更新UI
+                        handler.post {
+                            device.brightness = brightness
+                            device.isPowerOn = power
+                            holder.brightnessSeekbar.progress = brightness
+                            holder.brightnessValue.text = "$brightness%"
+                            holder.powerSwitch.isChecked = power
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                if (device.isConnected) {
+                    handler.post {
+                        Toast.makeText(context, "数据接收异常", Toast.LENGTH_SHORT).show()
+                        disconnectFromDevice(device, holder)
                     }
                 }
             }
@@ -152,17 +188,16 @@ class DeviceAdapter(
     // 断开设备连接
     private fun disconnectFromDevice(device: Device, holder: DeviceViewHolder) {
         try {
-            device.socket?.close()
+            device.isConnected = false // 先标记为断开状态
+            device.socket?.shutdownInput() // 关闭输入流
+            device.socket?.close() // 关闭socket
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
             device.socket = null
-            device.isConnected = false
-
-            // 在UI线程更新状态
             Handler(Looper.getMainLooper()).post {
                 updateConnectionUI(holder, false)
-                Toast.makeText(context, "您已断开连接", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "已断开连接", Toast.LENGTH_SHORT).show()
             }
         }
     }

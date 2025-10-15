@@ -9,5 +9,7 @@ data class Device(
     var isPowerOn: Boolean = true,  // 电源状态
     var brightness: Int = 70,       // 亮度值(0-100)
     var isConnected: Boolean = false,
-    var socket: Socket? = null
+    var socket: Socket? = null,
+    // 数据接收回调接口
+    var onDataReceived: ((Int, Boolean) -> Unit)? = null
 )
