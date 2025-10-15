@@ -61,7 +61,7 @@
         android:layout_margin="24dp"
         android:contentDescription="跳转到下一界面"
         android:src="@mipmap/icon_add_new"
-        app:backgroundTint="@color/black"
-        app:elevation="8dp" />
+        app:backgroundTint="@android:color/holo_green_dark"
+        app:elevation="6dp" />
 
 </FrameLayout>
