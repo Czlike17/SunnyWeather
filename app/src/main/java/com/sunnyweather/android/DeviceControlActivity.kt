@@ -53,6 +53,24 @@ class DeviceControlActivity : AppCompatActivity() {
             startActivityForResult(intent, ADD_DEVICE_REQUEST)
         }
 
+        findViewById<Button>(R.id.btn_turn_all_on).setOnClickListener {
+            if (deviceList.isEmpty()) {
+                Toast.makeText(this, "没有设备可操作", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            deviceAdapter.setAllDevicesPowerState(true)
+            Toast.makeText(this, "正在开启所有设备", Toast.LENGTH_SHORT).show()
+        }
+
+        findViewById<Button>(R.id.btn_turn_all_off).setOnClickListener {
+            if (deviceList.isEmpty()) {
+                Toast.makeText(this, "没有设备可操作", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            deviceAdapter.setAllDevicesPowerState(false)
+            Toast.makeText(this, "正在关闭所有设备", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

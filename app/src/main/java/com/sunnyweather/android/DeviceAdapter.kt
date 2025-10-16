@@ -287,4 +287,14 @@ class DeviceAdapter(
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, deviceList.size - position)  // 刷新后续项位置
     }
+
+    fun setAllDevicesPowerState(powerOn: Boolean) {
+        deviceList.forEachIndexed { index, device ->
+            if (device.isConnected) {  // 只控制已连接的设备
+                device.isPowerOn = powerOn
+                sendCommandToDevice(device)
+                notifyItemChanged(index)
+            }
+        }
+    }
 }

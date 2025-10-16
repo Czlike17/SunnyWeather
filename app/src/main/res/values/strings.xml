@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SunnyWeather</string>
+    <string name="back">返回</string>
+    <string name="power_switch">电源开关</string>
+    <string name="timer">定时</string>
+    <string name="smart_scene">智能场景</string>
+    <string name="voice_custom">语音定制</string>
+    <string name="enter">进入</string>
 </resources>
