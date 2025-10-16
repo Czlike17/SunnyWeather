@@ -53,9 +53,6 @@ class DeviceControlActivity : AppCompatActivity() {
             startActivityForResult(intent, ADD_DEVICE_REQUEST)
         }
 
-        findViewById<Button>(R.id.btn_weather)?.setOnClickListener {
-            startActivity(Intent(this, WeatherActivity::class.java))
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

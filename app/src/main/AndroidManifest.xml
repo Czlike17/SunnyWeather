@@ -15,7 +15,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".DeviceControlActivity"
+            android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,15 +23,28 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".DeviceControlActivity"
+            android:exported="false"
+            android:parentActivityName=".HomeActivity"/>
+        <activity
             android:name=".AddDeviceActivity"
+            android:exported="true"
+            android:parentActivityName=".DeviceControlActivity">
+        </activity>
+        <activity
+            android:name=".TimerActivity"
+            android:exported="true"
+            android:parentActivityName=".DeviceLightActivity">
+        </activity>
+        <activity
+            android:name=".DeviceLightActivity"
             android:exported="true"
             android:parentActivityName=".DeviceControlActivity">
         </activity>
         <activity
             android:name=".ui.weather.WeatherActivity"
             android:exported="true"
-            android:parentActivityName=".DeviceControlActivity"
-        />
+            android:parentActivityName=".DeviceControlActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

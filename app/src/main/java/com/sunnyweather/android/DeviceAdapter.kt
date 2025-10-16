@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import android.content.Context
+import android.content.Intent
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -90,6 +91,29 @@ class DeviceAdapter(
 
         holder.deleteButton.setOnClickListener {
             showDeleteConfirmDialog(holder.adapterPosition)
+        }
+        // 设备项空白处点击事件
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, DeviceLightActivity::class.java).apply {
+                putExtra("deviceName", device.name)
+                putExtra("ipAddress", device.ipAddress)
+                putExtra("port", device.port)
+                putExtra("isPowerOn", device.isPowerOn)
+                putExtra("brightness", device.brightness)
+            }
+            context.startActivity(intent)
+        }
+
+// 设备名称点击事件
+        holder.deviceName.setOnClickListener {
+            val intent = Intent(context, DeviceLightActivity::class.java).apply {
+                putExtra("deviceName", device.name)
+                putExtra("ipAddress", device.ipAddress)
+                putExtra("port", device.port)
+                putExtra("isPowerOn", device.isPowerOn)
+                putExtra("brightness", device.brightness)
+            }
+            context.startActivity(intent)
         }
     }
 
