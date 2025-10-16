@@ -145,6 +145,7 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@android:color/holo_green_dark"
                     android:paddingHorizontal="32dp"
+                    android:layout_marginStart="40dp"
                     android:text="添加"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
