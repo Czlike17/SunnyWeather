@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.SunnyWeather" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Base.Theme.SunnyWeather" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+<!--        android:background="@android:color/darker_gray"
+-->
+        <item name="android:statusBarColor">@android:color/darker_gray</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
+
 
     <style name="Theme.SunnyWeather" parent="Base.Theme.SunnyWeather" />
 </resources>

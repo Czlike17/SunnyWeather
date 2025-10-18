@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:id="@+id/actionBarLayout"
-        android:background="@color/design_default_color_primary">
+        android:background="@android:color/darker_gray">
         <Button
             android:id="@+id/btn_back_to_device"
             android:layout_width="60dp"
