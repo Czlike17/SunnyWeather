@@ -125,27 +125,32 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:orientation="horizontal"
-                android:gravity="center">
+                android:layout_marginVertical="16dp"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/darker_gray"
-                    android:paddingHorizontal="32dp"
+                    android:backgroundTint="@color/black"
+                    android:paddingHorizontal="60dp"
+                    android:paddingVertical="20dp"
                     android:text="取消"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
                 <Button
                     android:id="@+id/btn_add"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/holo_green_dark"
-                    android:paddingHorizontal="32dp"
-                    android:layout_marginStart="40dp"
+                    android:backgroundTint="@color/blue"
+                    android:paddingHorizontal="60dp"
+                    android:paddingVertical="20dp"
                     android:text="添加"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
